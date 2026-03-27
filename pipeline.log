@@ -1,0 +1,48 @@
+10:29:36  INFO      Cargando dataset: lastfm_dataset.csv
+10:30:00  INFO      Cargando dataset: lastfm_dataset.csv
+10:41:20  INFO      Cargando dataset: lastfm_dataset.csv
+10:42:03  INFO      Cargando dataset: lastfm_dataset.csv
+10:44:03  INFO      Cargando dataset: lastfm_dataset.csv
+10:44:44  INFO      Cargando dataset: src/lastfm_dataset.csv
+10:44:44  INFO      Shape: (59999, 10) | MBIDs válidos: 53,294
+10:44:44  INFO      ==============================================================
+10:44:44  INFO        ENRIQUECIMIENTO CON ACOUSTICBRAINZ
+10:44:44  INFO      ==============================================================
+10:44:44  INFO        Total tracks          : 59,999
+10:44:44  INFO        Con MBID válido       : 53,294
+10:44:44  INFO        Sin MBID (→ NaN)      : 6,705
+10:44:44  INFO        Muestra seleccionada  : 2,000 (random_state=42)
+10:44:44  INFO      ==============================================================
+10:45:15  INFO      Cargando dataset: src/lastfm_dataset.csv
+10:45:15  INFO      Shape: (59999, 10) | MBIDs válidos: 53,294
+10:45:15  INFO      ==============================================================
+10:45:15  INFO        ENRIQUECIMIENTO CON ACOUSTICBRAINZ
+10:45:15  INFO      ==============================================================
+10:45:15  INFO        Total tracks          : 59,999
+10:45:15  INFO        Con MBID válido       : 53,294
+10:45:15  INFO        Sin MBID (→ NaN)      : 6,705
+10:45:15  INFO        Muestra seleccionada  : 2,000 (random_state=42)
+10:45:15  INFO      ==============================================================
+10:46:37  INFO      [  100/2000] LL ✓8 ✗92 (8%) | HL ✓8 ✗92 (8%) | 2.4 req/s | ETA 26.0 min
+10:48:01  INFO      [  200/2000] LL ✓13 ✗187 (6%) | HL ✓13 ✗187 (6%) | 2.4 req/s | ETA 24.9 min
+10:49:22  INFO      [  300/2000] LL ✓16 ✗284 (5%) | HL ✓16 ✗284 (5%) | 2.4 req/s | ETA 23.4 min
+10:52:05  INFO      ==============================================================
+10:52:05  INFO        ENRIQUECIMIENTO CON ACOUSTICBRAINZ
+10:52:05  INFO      ==============================================================
+10:52:05  INFO        Total tracks          : 59,999
+10:52:05  INFO        Con MBID válido       : 53,294
+10:52:05  INFO        Sin MBID (→ NaN)      : 6,705
+10:52:05  INFO        Muestra seleccionada  : 10 (random_state=42)
+10:52:05  INFO      ==============================================================
+10:52:13  INFO      [   10/10] LL ✓0 ✗10 (0%) | HL ✓0 ✗10 (0%) | 2.5 req/s | ETA 0.0 min
+10:52:13  INFO      
+==============================================================
+10:52:13  INFO        RESUMEN FINAL
+10:52:13  INFO      ==============================================================
+10:52:13  INFO        Tracks procesados     : 10
+10:52:13  INFO        Low-level OK          : 0 (0.0%)
+10:52:13  INFO        High-level OK         : 0 (0.0%)
+10:52:13  INFO        Low-level sin datos   : 10 (100.0%)
+10:52:13  INFO        High-level sin datos  : 10 (100.0%)
+10:52:13  INFO        Archivo guardado en   : ./lastfm_enriched_20260327_1052.csv
+10:52:13  INFO      ==============================================================
