@@ -1,112 +1,120 @@
-# Data Science Project Boilerplate
+# 🎵 ProyectoFinal23 — Análisis del Mercado Musical
 
-This boilerplate is designed to kickstart data science projects by providing a basic setup for database connections, data processing, and machine learning model development. It includes a structured folder organization for your datasets and a set of pre-defined Python packages necessary for most data science tasks.
+App de análisis del mercado musical con Machine Learning sobre datos de **Last.fm API**.
+Predicción de popularidad de canciones + visualizaciones interactivas con Streamlit.
 
-## Structure
+---
 
-The project is organized as follows:
+## Qué hace la app
 
-- **`src/app.py`** → Main Python script where your project will run.
-- **`src/explore.ipynb`** → Notebook for exploration and testing. Once exploration is complete, migrate the clean code to `app.py`.
-- **`src/utils.py`** → Auxiliary functions, such as database connection.
-- **`requirements.txt`** → List of required Python packages.
-- **`models/`** → Will contain your SQLAlchemy model classes.
-- **`data/`** → Stores datasets at different stages:
-  - **`data/raw/`** → Raw data.
-  - **`data/interim/`** → Temporarily transformed data.
-  - **`data/processed/`** → Data ready for analysis.
+| Página | Descripción |
+|--------|-------------|
+| 🔮 Predictor de hit | Introduce características de una canción y obtén su probabilidad de ser un hit |
+| 📊 Dashboard | KPIs del mercado, distribuciones de popularidad, top artistas y géneros |
+| 🌍 Geografía | Popularidad y volumen de tracks por país |
+| 📈 Correlaciones | Heatmap de correlaciones Spearman entre variables |
+| 📅 Tendencias | Evolución temporal de publicaciones y popularidad por año |
+| 🏆 Rankings | Top N tracks por reproducciones totales y por engagement |
 
+---
 
-## ⚡ Initial Setup in Codespaces (Recommended)
+## Inicio rápido
 
-No manual setup is required, as **Codespaces is automatically configured** with the predefined files created by the academy for you. Just follow these steps:
+### En GitHub Codespaces (recomendado)
 
-1. **Wait for the environment to configure automatically**.
-   - All necessary packages and the database will install themselves.
-   - The automatically created `username` and `db_name` are in the **`.env`** file at the root of the project.
-2. **Once Codespaces is ready, you can start working immediately**.
-
-
-## 💻 Local Setup (Only if you can't use Codespaces)
-
-**Prerequisites**
-
-Make sure you have Python 3.11+ installed on your machine. You will also need pip to install the Python packages.
-
-**Installation**
-
-Clone the project repository to your local machine.
-
-Navigate to the project directory and install the required Python packages:
+Las dependencias se instalan automáticamente al crear el Codespace.
 
 ```bash
+# 1. Entrenar el modelo ML (una sola vez)
+python train_model.py
+
+# 2. Lanzar la app
+streamlit run src/app.py
+```
+
+### En local
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/JaimeAFL/ProyectoFinal23.git
+cd ProyectoFinal23
+
+# 2. Instalar dependencias
 pip install -r requirements.txt
+
+# 3. Entrenar el modelo
+python train_model.py
+
+# 4. Lanzar la app
+streamlit run src/app.py
 ```
 
-**Create a database (if necessary)**
+---
 
-Create a new database within the Postgres engine by customizing and executing the following command:
+## Datos
 
-```bash
-$ psql -U postgres -c "DO \$\$ BEGIN 
-    CREATE USER my_user WITH PASSWORD 'my_password'; 
-    CREATE DATABASE my_database OWNER my_user; 
-END \$\$;"
+| Archivo | Filas | Descripción |
+|---------|-------|-------------|
+| `data/raw/backup_tracks.csv` | ~34k | Metadata de tracks: nombre, artista, duración, tags, oyentes, playcount |
+| `data/raw/lastfm_dataset.csv` | 60k | Rankings globales y por país/género (multi-endpoint) |
+| `data/raw/tags_dataset.csv` | — | Géneros/tags de Last.fm |
+| `data/processed/df_merged-data.csv` | ~34k | Dataset unificado y deduplicado (entrada principal de la app) |
+
+**Fuentes:** Last.fm API (`chart.getTopTracks`, `geo.getTopTracks`, `tag.getTopTracks`, `track.getInfo`)
+
+---
+
+## Estructura del proyecto
+
 ```
-Connect to the Postgres engine to use your database, manipulate tables, and data:
-
-```bash
-$ psql -U my_user -d my_database
-```
-
-Once inside PSQL, you can create tables, run queries, insert, update, or delete data, and much more!
-
-**Environment Variables**
-
-Create a .env file in the root directory of the project to store your environment variables, such as your database connection string:
-
-```makefile
-DATABASE_URL="postgresql://<USER>:<PASSWORD>@<HOST>:<PORT>/<DB_NAME>"
-
-#example
-DATABASE_URL="postgresql://my_user:my_password@localhost:5432/my_database"
-```
-
-## Running the Application
-
-To run the application, execute the app.py script from the root directory of the project:
-
-```bash
-python src/app.py
-```
-
-## Adding Models
-
-To add SQLAlchemy model classes, create new Python script files within the models/ directory. These classes should be defined according to your database schema.
-
-Example model definition (`models/example_model.py`):
-
-```py
-from sqlalchemy.orm import declarative_base
-from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
-
-Base = declarative_base()
-
-class ExampleModel(Base):
-    __tablename__ = 'example_table'
-    id: Mapped[int] = mapped_column(primary_key=True)
-    username: Mapped[str] = mapped_column(unique=True)
+ProyectoFinal23/
+├── src/
+│   ├── app.py                    # App Streamlit (6 páginas)
+│   ├── data/
+│   │   ├── load_data.py          # Carga y unión de CSVs
+│   │   └── process_data.py       # Limpieza y feature engineering
+│   ├── models/
+│   │   └── predict.py            # Inferencia con el modelo entrenado
+│   └── visualization/
+│       └── charts.py             # Funciones de gráficos (matplotlib/seaborn)
+├── data/
+│   ├── raw/                      # Datos originales
+│   └── processed/                # Dataset listo para la app
+├── models/                       # Artefactos ML (.pkl, .txt)
+├── notebooks/                    # Exploración y desarrollo
+├── docs/                         # Documentación
+│   ├── arquitectura.md           # Arquitectura y funcionamiento
+│   ├── CHANGELOG.md              # Historial de versiones
+│   ├── errores.md                # Cuaderno de errores y soluciones
+│   └── specs_streamlit.md        # Especificaciones técnicas
+├── train_model.py                # Script de entrenamiento ML
+└── requirements.txt              # Dependencias
 ```
 
-## Working with Data
+---
 
-You can place your raw datasets in the data/raw directory, intermediate datasets in data/interim, and processed datasets ready for analysis in data/processed.
+## Modelo ML
 
-To process data, you can modify the app.py script to include your data processing steps, using pandas for data manipulation and analysis.
+- **Algoritmo:** RandomForestClassifier (n_estimators=100, random_state=42)
+- **Target:** `is_hit` — top 10% de tracks por playcount
+- **Features:** `log_listeners`, `duration_min`, `is_short_track`, `tag_encoded`, `artist_track_count`, `track_share_of_artist`, `playcount_per_listener`
+- **Nota:** el modelo predice popularidad histórica relativa al dataset. Ver `docs/errores.md` #17 para limitaciones.
 
-## Contributors
+---
 
-This template was built as part of the [Data Science and Machine Learning Bootcamp](https://4geeksacademy.com/us/coding-bootcamps/datascience-machine-learning) by 4Geeks Academy by [Alejandro Sanchez](https://twitter.com/alesanchezr) and many other contributors. Learn more about [4Geeks Academy BootCamp programs](https://4geeksacademy.com/us/programs) here.
+## Documentación
 
-Other templates and resources like this can be found on the school's GitHub page.
+- [Arquitectura y funcionamiento](docs/arquitectura.md)
+- [Historial de cambios](docs/CHANGELOG.md)
+- [Cuaderno de errores y soluciones](docs/errores.md)
+- [Especificaciones técnicas Streamlit](docs/specs_streamlit.md)
+
+---
+
+## Stack tecnológico
+
+`Python 3.11` · `Streamlit` · `pandas` · `scikit-learn` · `matplotlib` · `seaborn` · `joblib` · `Last.fm API`
+
+---
+
+*Proyecto desarrollado como parte del Data Science and Machine Learning Bootcamp — [4Geeks Academy](https://4geeksacademy.com)*
