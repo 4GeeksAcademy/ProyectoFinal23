@@ -311,7 +311,7 @@ elif pagina == '🏆 Rankings':
         cols_tabla2 = [c for c in cols_tabla2 if c in df_clean.columns]
         eng_df = (
             df_clean
-            .replace([float('inf'), float('-inf')], pd.NA)
+            .replace([float('inf'), float('-inf')], np.nan)
             .dropna(subset=['playcount_per_listener'])
             .nlargest(n, 'playcount_per_listener')[cols_tabla2]
             .reset_index(drop=True)

@@ -244,7 +244,7 @@ def plot_top_engagement(df_clean: pd.DataFrame, n: int = 25):
     """Horizontal bar chart de los top N tracks por playcount_per_listener."""
     top = (
         df_clean
-        .replace([float('inf'), float('-inf')], pd.NA)
+        .replace([float('inf'), float('-inf')], np.nan)
         .dropna(subset=['playcount_per_listener'])
         .nlargest(n, 'playcount_per_listener')
         .sort_values('playcount_per_listener')
