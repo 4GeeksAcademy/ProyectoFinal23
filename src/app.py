@@ -22,6 +22,10 @@ from visualization.charts import (
     plot_duration_vs_popularity,
     plot_geo_analysis,
     plot_correlation_heatmap,
+    plot_tracks_per_year,
+    plot_avg_playcount_by_year,
+    plot_top_tracks,
+    plot_top_engagement,
 )
 
 # ── Configuración ─────────────────────────────────────────────────────────────
@@ -57,7 +61,7 @@ FEATURES = FEATURES_model if FEATURES_model is not None else FEATURES_data
 st.sidebar.title('🎵 Mercado Musical')
 pagina = st.sidebar.radio(
     'Sección',
-    ['🔮 Predictor de hit', '📊 Dashboard', '🌍 Geografía', '📈 Correlaciones']
+    ['🔮 Predictor de hit', '📊 Dashboard', '🌍 Geografía', '📈 Correlaciones', '📅 Tendencias', '🏆 Rankings']
 )
 
 # ════════════════════════════════════════════════════════════════════════════════
@@ -230,3 +234,87 @@ elif pagina == '📈 Correlaciones':
         tabla.columns = ['Variable', 'Correlación (|ρ|)']
         tabla['Correlación (|ρ|)'] = tabla['Correlación (|ρ|)'].round(3)
         st.dataframe(tabla, use_container_width=True)
+
+# ════════════════════════════════════════════════════════════════════════════════
+# PÁGINA 5 — Tendencias
+# ════════════════════════════════════════════════════════════════════════════════
+elif pagina == '📅 Tendencias':
+    st.title('📅 Tendencias Temporales')
+    st.markdown('Evolución del mercado musical según las fechas de publicación de los tracks.')
+
+    df_time = df_clean.dropna(subset=['published']).copy()
+    df_time['year'] = pd.to_datetime(df_time['published'], errors='coerce').dt.year
+    df_time = df_time[(df_time['year'] >= 1950) & (df_time['year'] <= 2030)]
+
+    cobertura = len(df_time) / len(df_clean) * 100
+    if cobertura < 10:
+        st.info(f'Solo el {cobertura:.1f}% de los tracks tiene fecha de publicación conocida ({len(df_time):,} de {len(df_clean):,}). Los resultados representan un subset del dataset.')
+
+    if len(df_time) == 0:
+        st.warning('No hay tracks con fecha de publicación válida.')
+    else:
+        c1, c2, c3 = st.columns(3)
+        c1.metric('Tracks con fecha conocida', f'{len(df_time):,}')
+        c2.metric('Rango de años', f'{int(df_time["year"].min())} – {int(df_time["year"].max())}')
+        año_top = int(df_time['year'].value_counts().idxmax())
+        c3.metric('Año más representado', str(año_top))
+
+        st.markdown('---')
+        st.subheader('Tracks publicados por año')
+        fig_year = plot_tracks_per_year(df_clean)
+        if fig_year:
+            st.pyplot(fig_year)
+
+        st.markdown('---')
+        st.subheader('Popularidad media por año de publicación')
+        fig_pop = plot_avg_playcount_by_year(df_clean)
+        if fig_pop:
+            st.pyplot(fig_pop)
+        st.caption('Tracks sin fecha de publicación excluidos del análisis temporal.')
+
+# ════════════════════════════════════════════════════════════════════════════════
+# PÁGINA 6 — Rankings
+# ════════════════════════════════════════════════════════════════════════════════
+elif pagina == '🏆 Rankings':
+    st.title('🏆 Rankings de Tracks')
+    st.markdown('Los tracks más populares y con mayor engagement del dataset.')
+
+    n = st.slider('Nº de tracks a mostrar', 10, 100, 25)
+
+    tab1, tab2 = st.tabs(['🎵 Por popularidad (playcount)', '🔥 Por engagement (plays/oyente)'])
+
+    with tab1:
+        st.subheader(f'Top {n} tracks por reproducciones totales')
+        fig_top = plot_top_tracks(df_clean, n=n)
+        if fig_top:
+            st.pyplot(fig_top)
+
+        st.markdown('---')
+        cols_tabla = ['name', 'artist', 'tag', 'playcount', 'listeners', 'duration_min', 'is_hit']
+        cols_tabla = [c for c in cols_tabla if c in df_clean.columns]
+        top_df = (
+            df_clean.dropna(subset=['playcount'])
+            .nlargest(n, 'playcount')[cols_tabla]
+            .reset_index(drop=True)
+        )
+        top_df.index += 1
+        st.dataframe(top_df, use_container_width=True)
+
+    with tab2:
+        st.subheader(f'Top {n} tracks por engagement (reproducciones por oyente)')
+        fig_eng = plot_top_engagement(df_clean, n=n)
+        if fig_eng:
+            st.pyplot(fig_eng)
+
+        st.markdown('---')
+        cols_tabla2 = ['name', 'artist', 'tag', 'playcount_per_listener', 'playcount', 'listeners', 'is_hit']
+        cols_tabla2 = [c for c in cols_tabla2 if c in df_clean.columns]
+        eng_df = (
+            df_clean
+            .replace([float('inf'), float('-inf')], pd.NA)
+            .dropna(subset=['playcount_per_listener'])
+            .nlargest(n, 'playcount_per_listener')[cols_tabla2]
+            .reset_index(drop=True)
+        )
+        eng_df.index += 1
+        st.dataframe(eng_df, use_container_width=True)

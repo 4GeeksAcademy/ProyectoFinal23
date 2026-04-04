@@ -178,3 +178,82 @@ def plot_correlation_heatmap(df_clean: pd.DataFrame):
     plt.xticks(rotation=35, ha='right')
     plt.tight_layout()
     return fig
+
+
+def plot_tracks_per_year(df_clean: pd.DataFrame):
+    """Bar chart de tracks publicados por año."""
+    df_time = df_clean.dropna(subset=['published']).copy()
+    df_time['year'] = pd.to_datetime(df_time['published'], errors='coerce').dt.year
+    df_time = df_time[(df_time['year'] >= 1950) & (df_time['year'] <= 2030)]
+
+    if len(df_time) == 0:
+        return None
+
+    por_año = df_time.groupby('year').size().reset_index(name='n_tracks')
+
+    fig, ax = plt.subplots(figsize=(14, 4))
+    ax.bar(por_año['year'], por_año['n_tracks'], color='steelblue', edgecolor='white')
+    ax.set_title('Tracks por año de publicación', fontweight='bold')
+    ax.set_xlabel('Año')
+    ax.set_ylabel('Nº de tracks')
+    plt.tight_layout()
+    return fig
+
+
+def plot_avg_playcount_by_year(df_clean: pd.DataFrame):
+    """Line chart de playcount medio por año de publicación."""
+    df_time = df_clean.dropna(subset=['published', 'playcount']).copy()
+    df_time['year'] = pd.to_datetime(df_time['published'], errors='coerce').dt.year
+    df_time = df_time[(df_time['year'] >= 1950) & (df_time['year'] <= 2030)]
+
+    if len(df_time) == 0:
+        return None
+
+    por_año = df_time.groupby('year')['playcount'].mean().reset_index()
+
+    fig, ax = plt.subplots(figsize=(14, 4))
+    ax.plot(por_año['year'], por_año['playcount'], color='coral', marker='o', linewidth=2, markersize=4)
+    ax.set_title('Playcount medio por año de publicación', fontweight='bold')
+    ax.set_xlabel('Año')
+    ax.set_ylabel('Reproducciones medias')
+    ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{x/1e6:.1f}M'))
+    plt.tight_layout()
+    return fig
+
+
+def plot_top_tracks(df_clean: pd.DataFrame, n: int = 25):
+    """Horizontal bar chart de los top N tracks por playcount."""
+    top = (
+        df_clean
+        .dropna(subset=['playcount'])
+        .nlargest(n, 'playcount')
+        .sort_values('playcount')
+    )
+    top['label'] = top['artist'] + ' — ' + top['name']
+
+    fig, ax = plt.subplots(figsize=(12, max(4, n * 0.35)))
+    ax.barh(top['label'], top['playcount'], color='steelblue')
+    ax.set_title(f'Top {n} tracks por reproducciones', fontweight='bold')
+    ax.set_xlabel('Reproducciones')
+    ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{x/1e6:.0f}M'))
+    plt.tight_layout()
+    return fig
+
+
+def plot_top_engagement(df_clean: pd.DataFrame, n: int = 25):
+    """Horizontal bar chart de los top N tracks por playcount_per_listener."""
+    top = (
+        df_clean
+        .replace([float('inf'), float('-inf')], pd.NA)
+        .dropna(subset=['playcount_per_listener'])
+        .nlargest(n, 'playcount_per_listener')
+        .sort_values('playcount_per_listener')
+    )
+    top['label'] = top['artist'] + ' — ' + top['name']
+
+    fig, ax = plt.subplots(figsize=(12, max(4, n * 0.35)))
+    ax.barh(top['label'], top['playcount_per_listener'], color='coral')
+    ax.set_title(f'Top {n} tracks por engagement (plays / oyente)', fontweight='bold')
+    ax.set_xlabel('Reproducciones por oyente')
+    plt.tight_layout()
+    return fig
