@@ -1,0 +1,7 @@
+log_listeners
+duration_min
+is_short_track
+tag_encoded
+artist_track_count
+track_share_of_artist
+playcount_per_listener
